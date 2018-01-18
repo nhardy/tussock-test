@@ -59,7 +59,7 @@ yargs.command('*', 'Informational message', () => {}, () => {
       .then(runTask('clean', clean))
       .then(runTask('ensure-certificate', ensureCertificate))
       .then(runTask('webpack-prod', webpackProd))
-      .then(failOnError);
+      .catch(failOnError);
   })
   .command('package', 'Packages the pre-built application to a zip', () => {}, () => {
     Promise.resolve()
