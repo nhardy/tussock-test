@@ -92,33 +92,33 @@ jobs:
             - v1-npm-deps-{{ arch }}-{{ checksum "package.json" }}
       - run:
           name: Building and packaging the application
-          command: npm run package
+          command: npm run build
       - save_cache:
           key: v1-build-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - .tmp
             - dist
 
-  acceptance:
-    <<: *JOB_DEFAULTS
-    steps:
-      - restore_cache:
-          keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-npm-deps-{{ arch }}-{{ checksum "package.json" }}
-      - restore_cache:
-          keys:
-            - v1-build-{{ .Environment.CIRCLE_SHA1 }}
-      - run:
-          name: Running local acceptance tests
-          command: npm run test:acceptance -- --reporter mocha-junit-reporter
-          environment:
-            MOCHA_FILE: local-acceptance-test-results.xml
-      - store_artifacts:
-          path: local-acceptance-test-results.xml
-          prefix: acceptance-tests
+  # acceptance:
+  #   <<: *JOB_DEFAULTS
+  #   steps:
+  #     - restore_cache:
+  #         keys:
+  #           - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+  #     - restore_cache:
+  #         keys:
+  #           - v1-npm-deps-{{ arch }}-{{ checksum "package.json" }}
+  #     - restore_cache:
+  #         keys:
+  #           - v1-build-{{ .Environment.CIRCLE_SHA1 }}
+  #     - run:
+  #         name: Running local acceptance tests
+  #         command: npm run test:acceptance -- --reporter mocha-junit-reporter
+  #         environment:
+  #           MOCHA_FILE: local-acceptance-test-results.xml
+  #     - store_artifacts:
+  #         path: local-acceptance-test-results.xml
+  #         prefix: acceptance-tests
 
   deploy:
     <<: *JOB_DEFAULTS
@@ -133,38 +133,38 @@ jobs:
           keys:
             - v1-build-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: Deploying to Azure App Service
-          command: npm run deploy
+          name: Deploying to AWS S3
+          command: npm run deployToS3
 
-  healthcheck:
-    <<: *JOB_DEFAULTS
-    steps:
-      - restore_cache:
-          keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-npm-deps-{{ arch }}-{{ checksum "package.json" }}
-      - run:
-          name: Waiting for the server to be healthy
-          command: |
-            for i in `seq 1 12`; do
-              curl --output /dev/null --silent --head --fail $PUBLIC_URL/api/healthcheck && echo "Server is up and healthy" && break
-              echo "Waiting for server to come up..."
-              sleep 5
-            done
-      - run:
-          name: Running Acceptance Tests (post-deploy)
-          command: |
-            ACCEPTANCE_TEST_HOST=$PUBLIC_URL
-            export ACCEPTANCE_TEST_HOST
-            npm run test:acceptance -- --reporter mocha-junit-reporter
-            unset -v ACCEPTANCE_TEST_HOST
-          environment:
-            MOCHA_FILE: acceptance-test-results.xml
-      - store_artifacts:
-          path: acceptance-test-results.xml
-          prefix: acceptance-tests
+  # healthcheck:
+  #   <<: *JOB_DEFAULTS
+  #   steps:
+  #     - restore_cache:
+  #         keys:
+  #           - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+  #     - restore_cache:
+  #         keys:
+  #           - v1-npm-deps-{{ arch }}-{{ checksum "package.json" }}
+  #     - run:
+  #         name: Waiting for the server to be healthy
+  #         command: |
+  #           for i in `seq 1 12`; do
+  #             curl --output /dev/null --silent --head --fail $PUBLIC_URL/api/healthcheck && echo "Server is up and healthy" && break
+  #             echo "Waiting for server to come up..."
+  #             sleep 5
+  #           done
+  #     - run:
+  #         name: Running Acceptance Tests (post-deploy)
+  #         command: |
+  #           ACCEPTANCE_TEST_HOST=$PUBLIC_URL
+  #           export ACCEPTANCE_TEST_HOST
+  #           npm run test:acceptance -- --reporter mocha-junit-reporter
+  #           unset -v ACCEPTANCE_TEST_HOST
+  #         environment:
+  #           MOCHA_FILE: acceptance-test-results.xml
+  #     - store_artifacts:
+  #         path: acceptance-test-results.xml
+  #         prefix: acceptance-tests
 
 workflows:
   version: 2
@@ -186,21 +186,21 @@ workflows:
       - build:
           requires:
             - dependencies
-      - acceptance:
-          requires:
-            - build
+      # - acceptance:
+      #     requires:
+      #       - build
       - deploy:
           requires:
             - lint
             - flow
             - coverage
-            - acceptance
+            # - acceptance
           filters:
             branches:
               only: master
-      - healthcheck:
-          requires:
-            - deploy
+      # - healthcheck:
+      #     requires:
+      #       - deploy
           filters:
             branches:
               only: master

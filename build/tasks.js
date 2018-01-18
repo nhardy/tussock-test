@@ -7,7 +7,7 @@ import clean from './clean';
 import ensureCertificate from './certificate';
 import serve from './serve';
 import { webpackProd, webpackClientDev, webpackServerDev } from './webpack';
-import { zip, deploy } from './deploy';
+import { zip, deploy, deployToS3 } from './deploy';
 
 
 function runTask(name, runner: () => Promise<any>) {
@@ -54,17 +54,26 @@ yargs.command('*', 'Informational message', () => {}, () => {
       .then(runTask('serve', serve))
       .catch(failOnError);
   })
-  .command('package', 'Builds the application to a zip', () => {}, () => {
+  .command('build', 'Builds the application in production mode', () => {}, () => {
     Promise.resolve()
       .then(runTask('clean', clean))
       .then(runTask('ensure-certificate', ensureCertificate))
       .then(runTask('webpack-prod', webpackProd))
+      .then(failOnError);
+  })
+  .command('package', 'Packages the pre-built application to a zip', () => {}, () => {
+    Promise.resolve()
       .then(runTask('zip', zip))
       .catch(failOnError);
   })
   .command('deploy', 'Deploys the pre-built application to the Azure App Service', () => {}, () => {
     Promise.resolve()
       .then(runTask('deploy', deploy))
+      .catch(failOnError);
+  })
+  .command('deployToS3', 'Deploys the pre-built application to AWS S3', () => {}, () => {
+    Promise.resolve()
+      .then(runTask('deployToS3', deployToS3))
       .catch(failOnError);
   })
   // .demandCommand()
