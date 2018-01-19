@@ -8,6 +8,7 @@ import { makeAbsoluteUrl } from 'app/lib/social';
 import * as appPropTypes from 'app/components/propTypes';
 import ErrorView from 'app/views/Error';
 import UnsupportedMessage from 'app/components/UnsupportedMessage';
+import { subscribe } from 'app/actions/mqtt';
 import faviconPng from 'app/assets/images/favicon-1024.png';
 import 'app/assets/stylus/reset.styl';
 import 'app/assets/stylus/fonts.styl';
@@ -17,7 +18,7 @@ import styles from './styles.styl';
 
 @connect(state => ({
   routeError: state.routeError,
-}))
+}), { subscribe })
 export default class App extends Component {
   static propTypes = {
     routeError: PropTypes.object, // eslint-disable-line react/forbid-prop-types
@@ -38,6 +39,10 @@ export default class App extends Component {
     return {
       location: this.props.location,
     };
+  }
+
+  componentDidMount() {
+    this.props.subscribe('room');
   }
 
   render() {

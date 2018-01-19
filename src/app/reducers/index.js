@@ -6,6 +6,7 @@ import { reducer as scripts } from 'redux-scripts-manager';
 import routeError from './routeError';
 import github from './github';
 import govhack from './govhack';
+import mqtt from './mqtt';
 
 
 export default combineReducers({
@@ -16,4 +17,5 @@ export default combineReducers({
   routeError,
   github,
   govhack,
+  mqtt,
 });
