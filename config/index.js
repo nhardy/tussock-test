@@ -1,7 +1,7 @@
 export default {
   port: process.env.PORT || '8000',
   publicUrl: process.env.PUBLIC_URL,
-  siteName: 'nhardy.id.au',
+  siteName: 'Tussock Test',
   analytics: {
     trackingId: process.env.ANALYTICS_TRACKING_ID,
   },
