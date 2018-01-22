@@ -64,7 +64,7 @@ export default class SiteHeader extends Component<Props, State> {
               <li className={styles.item}>
                 <Link className={styles.link} to="/">Home</Link>
               </li>
-              <li className={styles.item}>
+              {/* <li className={styles.item}>
                 <Link className={styles.link} to="/contact">Contact Me</Link>
               </li>
               <li className={styles.item}>
@@ -75,7 +75,7 @@ export default class SiteHeader extends Component<Props, State> {
               </li>
               <li className={styles.item}>
                 <Link className={styles.link} to="/govhack">GovHack</Link>
-              </li>
+              </li> */}
             </ul>
           </nav>
         </div>

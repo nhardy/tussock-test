@@ -12,6 +12,7 @@ import faviconPng from 'app/assets/images/favicon-1024.png';
 import 'app/assets/stylus/reset.styl';
 import 'app/assets/stylus/fonts.styl';
 import 'font-awesome/css/font-awesome.min.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import styles from './styles.styl';
 
 

@@ -25,5 +25,6 @@ export default {
     // End IMPORTANT
     endpointAddress: 'a2qk64r47ogbmr.iot.ap-southeast-2.amazonaws.com',
     region: 'ap-southeast-2',
+    topic: 'main-room',
   },
 };
