@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
-import { get } from 'lodash-es';
+import { get, isEqual } from 'lodash-es';
 
 import config from 'app/config';
 import { registerHandle, subscribe, messageOutgoing } from 'app/actions/mqtt';
@@ -36,12 +36,21 @@ export default class Chat extends Component<Props, State> {
     this.props.subscribe(config.mqtt.topic);
   }
 
-  pickHandle = () => {
+  componentDidUpdate(prevProps: Props) {
+    if (!isEqual(prevProps.messages, this.props.messages)) {
+      this._messages.scrollTop = this._messages.scrollHeight;
+    }
+  }
+
+  pickHandle = (e: Event) => {
+    e.preventDefault();
     const valid = this._handle.checkValidity();
     valid && this.props.registerHandle(this._handle.value);
   };
 
-  sendMessage = async () => {
+  sendMessage = async (e) => {
+    e.preventDefault();
+
     if (!this._message.checkValidity()) return;
 
     this.setState({ inflight: true });
@@ -61,15 +70,15 @@ export default class Chat extends Component<Props, State> {
     return (
       <div className={styles.root}>
         {!handle && (
-          <div className={styles.prompt}>
+          <form className={styles.prompt} onSubmit={this.pickHandle}>
             <label className={styles.pick}>
-              <span>Pick a handle:</span>
-              <input type="text" pattern="[a-z0-9]{3,15}" ref={ref => (this._handle = ref)} />
+              <span className="col-form-label col-form-label-lg">Pick a handle:</span>
+              <input type="text" className={cx('form-control', 'form-control-lg', styles.handle)} pattern="[a-z0-9]{3,15}" ref={ref => (this._handle = ref)} />
             </label>
-            <button onClick={this.pickHandle}>Join</button>
-          </div>
+            <button type="submit" className={cx('btn', 'btn-lg', 'btn-primary', styles.button)}>Join</button>
+          </form>
         )}
-        <div className={cx(styles.messages, { [styles.blurred]: !handle })}>
+        <div className={cx(styles.messages, { [styles.blurred]: !handle })} ref={ref => (this._messages = ref)}>
           {messages.map(({ handle: sender, message }, i) => (
             <div className={styles.message} key={i}>
               <span className={styles.sender}>{sender} says:</span>
@@ -77,11 +86,13 @@ export default class Chat extends Component<Props, State> {
             </div>
           ))}
         </div>
-        <div className={cx(styles.draft, { [styles.blurred]: !handle })}>
-          <span className={styles.user}>{handle || 'You'}:</span>
-          <input type="text" pattern=".+" ref={ref => (this._message = ref)} disabled={inflight || !handle} />
-          <button onClick={this.sendMessage} disabled={inflight || !handle}>Send</button>
-        </div>
+        <form className={cx(styles.messaging, { [styles.blurred]: !handle })} onSubmit={this.sendMessage}>
+          <label className={styles.draft}>
+            <span className="col-form-label col-form-label-lg">{handle || 'You'}:</span>
+            <input type="text" className={cx('form-control', 'form-control-lg', styles.input)} pattern=".+" ref={ref => (this._message = ref)} disabled={inflight || !handle} />
+          </label>
+          <button type="submit" className={cx('btn', 'btn-lg', 'btn-primary', styles.button)} disabled={inflight || !handle}>Send</button>
+        </form>
       </div>
     );
   }

@@ -18,6 +18,7 @@
   bottom: 16px
   right: 16px
   display: flex
+  flex-direction: column
   align-items: center
   justify-content: center
   border: 1px solid rgba($black, 0.85)
@@ -25,6 +26,7 @@
   padding: 8px
   height: calc(100% - 32px)
   width: calc(100% - 32px)
+  background: rgba($white, 0.85)
   z-index: 1
 
   +from($med)
@@ -34,9 +36,37 @@
     right: 48px
     height: calc(100% - 96px)
     width: calc(100% - 96px)
+    flex-direction: row
 
 .pick
   display: inline-block
+
+  +upTo($med)
+    width: 100%
+    text-align: center
+
+  +from($med)
+    margin-bottom: 0
+
+  span
+    display: inline-block
+
+    +upTo($med)
+      width: 100%
+      text-align: center
+
+    +from($med)
+      margin-right: 8px
+
+.handle
+  +from($med)
+    display: inline-block
+    width: auto
+    margin-right: 8px
+
+.button
+  +upTo($med)
+    width: 100%
 
 .messages
   composes: blurable
@@ -77,8 +107,27 @@
   +from($med)
     padding: 8px 0
 
-.draft
+.messaging
   composes: blurable
   display: flex
+  flex-direction: column
   border-top: 1px solid $themeColor
   padding: 8px
+
+  +from($med)
+    flex-direction: row
+
+.draft
+  composes: pick
+
+  +from($med)
+    display: flex
+    flex: 1 1 auto
+
+  span
+    +from($med)
+      width: 150px
+
+.input
+  composes: handle
+  flex: 1 1 auto
