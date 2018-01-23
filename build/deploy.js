@@ -75,8 +75,13 @@ export async function deployToS3() {
   };
 
   const indexHtml = await new Promise(async (resolve, reject) => {
+    console.log('[deploy-to-s3]', 'Spawning a local server to generate index.html');
     const server = spawn('node', ['server.js'], { cwd: path.resolve(__dirname, '..') });
-    server.on('error', reject);
+    server.on('error', (error) => {
+      console.error('[deploy-to-s3]', 'The local server encountered an error', error);
+      server.kill();
+      reject(error);
+    });
     let stopTrying = false;
     timeout(30000)
       .then(() => {
@@ -85,14 +90,13 @@ export async function deployToS3() {
     let result = null;
     while (!result && !stopTrying) {
       try {
+        console.log('[deploy-to-s3]', 'Attempting to fetch index.html from local server');
         // eslint-disable-next-line no-await-in-loop
         result = await fetch(`http://localhost:${config.port}`)
-          .then(raw => raw.text())
-          .then((response) => {
-            server.kill();
-            resolve(response);
-          });
-      } catch (e) {
+          .then(raw => (raw.status >= 400 ? Promise.reject(raw.statusText) : Promise.resolve(raw)))
+          .then(raw => raw.text());
+      } catch (error) {
+        console.error('[deploy-to-s3]', 'Encountered an error fetching index.html:', error);
         // eslint-disable-next-line no-await-in-loop
         await timeout(150);
       }
@@ -101,6 +105,7 @@ export async function deployToS3() {
     if (result) {
       resolve(result);
     } else {
+      server.kill();
       reject(new Error('The local server did not start in time'));
     }
   });
