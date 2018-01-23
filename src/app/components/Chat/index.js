@@ -44,8 +44,9 @@ export default class Chat extends Component<Props, State> {
 
   pickHandle = (e: Event) => {
     e.preventDefault();
-    const valid = this._handle.checkValidity();
-    valid && this.props.registerHandle(this._handle.value);
+    if (!this._handle.checkValidity()) return;
+    this.props.registerHandle(this._handle.value);
+    this._message.focus();
   };
 
   sendMessage = async (e) => {
@@ -61,6 +62,7 @@ export default class Chat extends Component<Props, State> {
     await timeout(150);
     this._message.value = '';
     this.setState({ inflight: false });
+    this._message.focus();
   };
 
   render() {

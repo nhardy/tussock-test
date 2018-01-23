@@ -12,8 +12,12 @@ html
 body
   color: $textColor
 
-a:hover
-  text-decoration: none
+a
+  color: inherit
+  text-decoration: underline
+
+  &:hover
+    text-decoration: none
 
 :global(#root)
   font-family: $fontStack
