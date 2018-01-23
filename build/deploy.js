@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable no-console */
 
 import fs from 'fs';
 import path from 'path';
@@ -75,10 +76,10 @@ export async function deployToS3() {
   };
 
   const indexHtml = await new Promise(async (resolve, reject) => {
-    console.log('[deploy-to-s3]', 'Spawning a local server to generate index.html');
+    console.log('[deployToS3]', 'Spawning a local server to generate index.html');
     const server = spawn('node', ['server.js'], { cwd: path.resolve(__dirname, '..') });
     server.on('error', (error) => {
-      console.error('[deploy-to-s3]', 'The local server encountered an error', error);
+      console.error('[deployToS3]', 'The local server encountered an error', error);
       server.kill();
       reject(error);
     });
@@ -90,15 +91,15 @@ export async function deployToS3() {
     let result = null;
     while (!result && !stopTrying) {
       try {
-        console.log('[deploy-to-s3]', 'Attempting to fetch index.html from local server');
+        console.log('[deployToS3]', 'Attempting to fetch index.html from local server');
         // eslint-disable-next-line no-await-in-loop
         result = await fetch(`http://localhost:${config.port}`)
           .then(raw => (raw.status >= 400 ? Promise.reject(raw.statusText) : Promise.resolve(raw)))
           .then(raw => raw.text());
       } catch (error) {
-        console.error('[deploy-to-s3]', 'Encountered an error fetching index.html:', error);
+        console.error('[deployToS3]', 'Encountered an error fetching index.html:', error);
         // eslint-disable-next-line no-await-in-loop
-        await timeout(150);
+        await timeout(1000);
       }
     }
 

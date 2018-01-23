@@ -25,10 +25,8 @@ function runTask(name, runner: () => Promise<any>) {
   };
 }
 
-function failOnError(error: Error) {
-  if (error) {
-    process.exitCode = 1;
-  }
+function failOnError() {
+  process.exit(1);
 }
 
 // `yargs` uses a getter function to execute
