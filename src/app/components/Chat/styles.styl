@@ -2,4 +2,83 @@
 
 
 .root
-  border: none
+  position: relative
+  border: 1px solid $themeColor
+
+.blurable
+  transition: filter 250ms ease-in-out
+
+.blurred
+  filter: blur(5px)
+
+.prompt
+  position: absolute
+  top: 16px
+  left: 16px
+  bottom: 16px
+  right: 16px
+  display: flex
+  align-items: center
+  justify-content: center
+  border: 1px solid rgba($black, 0.85)
+  border-radius: 2px
+  padding: 8px
+  height: calc(100% - 32px)
+  width: calc(100% - 32px)
+  z-index: 1
+
+  +from($med)
+    top: 48px
+    left: 48px
+    bottom: 48px
+    right: 48px
+    height: calc(100% - 96px)
+    width: calc(100% - 96px)
+
+.pick
+  display: inline-block
+
+.messages
+  composes: blurable
+  height: 500px
+  overflow-y: auto
+
+.message
+  display: flex
+  flex-wrap: wrap
+
+  &:not(:last-child)
+    border-bottom: 1px dashed $themeColor
+
+  +from($med)
+    flex-wrap: nowrap
+    padding: 0 8px
+
+.sender
+  flex: 0 0 auto
+  width: 100%
+  padding: 8px 0
+
+  +upTo($med)
+    border-bottom: 1px solid $borderColor
+    padding: 8px
+    text-align: center
+
+  +from($med)
+    margin-right: 8px
+    border-right: 1px solid $borderColor
+    width: 100px
+    padding-right: 8px
+
+.content
+  flex: 1 1 auto
+  padding: 8px
+
+  +from($med)
+    padding: 8px 0
+
+.draft
+  composes: blurable
+  display: flex
+  border-top: 1px solid $themeColor
+  padding: 8px

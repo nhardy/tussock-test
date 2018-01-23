@@ -1,3 +1,5 @@
+/* eslint-disable react/no-array-index-key */
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
@@ -35,16 +37,20 @@ export default class Chat extends Component<Props, State> {
   }
 
   pickHandle = () => {
-    this.props.registerHandle(this._handle.value);
+    const valid = this._handle.checkValidity();
+    valid && this.props.registerHandle(this._handle.value);
   };
 
   sendMessage = async () => {
+    if (!this._message.checkValidity()) return;
+
     this.setState({ inflight: true });
     // Ideally this would return a Redux Thunk Promise to be awaited on
     // but for the purposes of this test, a delay will be simulated instead
     this.props.messageOutgoing(config.mqtt.topic, this._message.value);
 
     await timeout(150);
+    this._message.value = '';
     this.setState({ inflight: false });
   };
 
@@ -56,21 +62,24 @@ export default class Chat extends Component<Props, State> {
       <div className={styles.root}>
         {!handle && (
           <div className={styles.prompt}>
-            <input type="text" ref={ref => (this._handle = ref)} />
+            <label className={styles.pick}>
+              <span>Pick a handle:</span>
+              <input type="text" pattern="[a-z0-9]{3,15}" ref={ref => (this._handle = ref)} />
+            </label>
             <button onClick={this.pickHandle}>Join</button>
           </div>
         )}
         <div className={cx(styles.messages, { [styles.blurred]: !handle })}>
-          {messages.map(({ handle: them, message }) => (
-            <div className={styles.message}>
-              <span className={styles.handle}>{them}</span>
+          {messages.map(({ handle: sender, message }, i) => (
+            <div className={styles.message} key={i}>
+              <span className={styles.sender}>{sender} says:</span>
               <span className={styles.content}>{message}</span>
             </div>
           ))}
         </div>
         <div className={cx(styles.draft, { [styles.blurred]: !handle })}>
-          <span className={styles.user}>{handle}</span>
-          <input type="text" ref={ref => (this._message = ref)} disabled={inflight || !handle} />
+          <span className={styles.user}>{handle || 'You'}:</span>
+          <input type="text" pattern=".+" ref={ref => (this._message = ref)} disabled={inflight || !handle} />
           <button onClick={this.sendMessage} disabled={inflight || !handle}>Send</button>
         </div>
       </div>

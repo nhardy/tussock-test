@@ -78,7 +78,7 @@ export async function deployToS3() {
     const server = spawn('node', ['server.js'], { cwd: path.resolve(__dirname, '..') });
     server.on('error', reject);
     let stopTrying = false;
-    timeout(10000)
+    timeout(30000)
       .then(() => {
         stopTrying = true;
       });
@@ -101,7 +101,7 @@ export async function deployToS3() {
     if (result) {
       resolve(result);
     } else {
-      reject(new Error('Could not get a response in time'));
+      reject(new Error('The local server did not start in time'));
     }
   });
 

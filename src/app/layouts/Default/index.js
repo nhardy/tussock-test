@@ -53,7 +53,7 @@ export default class DefaultLayout extends Component {
         >
           <div className={styles.inner}>
             <span className={styles.name}><Link to="/">Nathan Hardy</Link></span>
-            <span className={styles.tagline}>Student | Developer</span>
+            <span className={styles.tagline}>Severless Chat App</span>
           </div>
         </Parallax>
         <main className={cx(styles.main, this.props.className)}>
