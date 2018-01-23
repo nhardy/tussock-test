@@ -103,21 +103,14 @@ export async function deployToS3() {
       }
     }
 
+    server.kill();
+
     if (result) {
       resolve(result);
     } else {
-      server.kill();
       reject(new Error('The local server did not start in time'));
     }
   });
-
-  await s3Service.upload({
-    ...uploadParams,
-    Key: 'index.html',
-    Body: indexHtml,
-    ContentType: 'text/html',
-  })
-    .promise();
 
   await Promise.all((await new Promise((resolve, reject) => {
     glob(
@@ -146,4 +139,12 @@ export async function deployToS3() {
       })
         .promise();
     }));
+
+  await s3Service.upload({
+    ...uploadParams,
+    Key: 'index.html',
+    Body: indexHtml,
+    ContentType: 'text/html',
+  })
+    .promise();
 }
