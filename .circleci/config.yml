@@ -194,6 +194,7 @@ workflows:
             - lint
             - flow
             - coverage
+            - build
             # - acceptance
           filters:
             branches:
